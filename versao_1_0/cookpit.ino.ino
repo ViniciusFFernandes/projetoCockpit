@@ -1,10 +1,12 @@
-//#include <Keyboard.h>
+#include <Keyboard.h>
 
 //Teclas de ações
-//String teclasMotores[] = {"KEY_F1", "KEY_F2", "KEY_F3", "KEY_F4"};
-//String teclaFlaps = "F";
-//String teclaTremPouso = "G";
-//String teclaEmbandeiramento = "KEY_F5";
+word teclasMotores[] = {"KEY_F1", "KEY_F2", "KEY_F3", "KEY_F4"};
+char teclaFlaps = 'F';
+char teclaTremPouso = 'G';
+word teclaEmbandeiramento = "KEY_F5";
+char teclaCompartimentoBomba = '';
+char teclaSerieBombas = '';
 //Configuração de pinos dos controle
 int pinoEmbandeiramento[] = {2, 3, 4, 5};
 int pinoFlaps = 6;
@@ -17,10 +19,12 @@ int motorEmbandeirado[] = {0, 0, 0, 0};
 bool estadoFlaps = false;
 //Estado do trem de pouso
 bool estadoTremPouso = true;
+//Estado do trem de pouso
+bool estadoCompartimentoBomba = true;
 
 void setup(){
     Serial.begin(9600);
-    //Keyboard.begin();
+    Keyboard.begin();
     //
     int motor = 0;
     while(motor <= 3){
@@ -44,32 +48,49 @@ void loop(){
 //Rotina de Bombas
 //
 void liberarSerieBombas(){
-
+  if(digitalRead(pinoBombas) == HIGH){
+    Serial.println("Liberando Bombas!");
+    Keyboard.write(teclaSerieBombas);
+  }
 }
 
 //
 //Rotina de Compartimento de Bombas
 //
 void abrirCompartimentoBombas(){
-
+  if(digitalRead(pinoPortaBombas) == HIGH){
+        //Se ele nao estiver ativo ira acionar
+        if(!estadoCompartimentoBomba){
+            Serial.println("Abrindo Compartimento de Bombas!");
+            Keyboard.write(teclaCompartimentoBomba);
+            estadoCompartimentoBomba = true;
+        }
+    }else{
+        //Se ele estiver ativo ira desacionar
+        if(estadoCompartimentoBomba){
+            Serial.println("Fechando Compartimento de Bombas!");
+            Keyboard.write(teclaCompartimentoBomba);
+            estadoCompartimentoBomba = false;
+        }
+    }
 }
 
 //
 //Rotina dos flaps
 //
 void verificaFlaps(){
-    if(digitalRead(pinoFlaps) == HIGH){
+    if(digitalRead(pinoPortaBombas) == HIGH){
         //Se ele nao estiver ativo ira acionar
         if(!estadoFlaps){
             Serial.println("Ativando flaps!");
-            //Keyboard.write(teclaFlaps);
+            Keyboard.write(teclaFlaps);
             estadoFlaps = true;
         }
     }else{
         //Se ele estiver ativo ira desacionar
         if(estadoFlaps){
             Serial.println("Desativando flaps!");
-            //Keyboard.write(teclaFlaps);
+            Keyboard.write(teclaFlaps);
             estadoFlaps = false;
         }
     }
@@ -83,14 +104,14 @@ void verificaTremPouso(){
         //Se ele nao estiver ativo ira acionar
         if(!estadoTremPouso){
             Serial.println("Abaixando trem de pouso!");
-            //Keyboard.write(teclaTremPouso);
+            Keyboard.write(teclaTremPouso);
             estadoTremPouso = true;
         }
     }else{
         //Se ele estiver ativo ira desacionar
         if(estadoTremPouso){
             Serial.println("Recolhendo trem de pouso!");
-            //Keyboard.write(teclaFlaps);
+            Keyboard.write(teclaFlaps);
             estadoTremPouso = false;
         }
     }
@@ -126,14 +147,16 @@ void embandeirarDesembandeirar(int motorAlterado){
     //Define a ação
     if(motorEmbandeirado[motorAlterado] == 1){
         Serial.println("Acao de desembandeiramento motor:" + String(motorAlterado + 1));
-      //Keyboard.write(teclasMotores[motor]);
-      motorEmbandeirado[motorAlterado] = 0;
+        Keyboard.write(teclasMotores[motorAlterado]);
+        motorEmbandeirado[motorAlterado] = 0;
     }else{
         Serial.println("Acao de embandeiramento motor:" + String(motorAlterado + 1));
-      motorEmbandeirado[motorAlterado] = 1;
+        //Executa a ação
+        Keyboard.write(teclaEmbandeiramento);
+        //desativa motor embandeirado
+        Keyboard.write(teclasMotores[motorAlterado]);
+        motorEmbandeirado[motorAlterado] = 1;
     }
-    //Executa a ação
-    //Keyboard.write(teclaEmbandeiramento);
     //Reativa Motores validos
     selecionaMotores(motorAlterado);
 }
@@ -142,7 +165,7 @@ void selecionaMotores(int motorAlterado){
   int motor = 0;
     while(motor <= 3){
       if(motorEmbandeirado[motor] != 1 && motor != motorAlterado){
-        //Keyboard.write(teclasMotores[motor]); 
+        Keyboard.write(teclasMotores[motor]); 
         Serial.println("Ativando/Desativando motor:" + String(motor + 1));
       }
       motor++;
