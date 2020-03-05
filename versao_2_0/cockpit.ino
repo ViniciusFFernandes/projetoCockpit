@@ -12,8 +12,8 @@
 
     //Pinos do multiplexador onde ou botoes entao ligados
     int pinoMotor[] = {0, 1, 2, 3};
-    int posiFlaps = 4;
-    int posiTremPouso = 5;
+    int pinoFlaps = 4;
+    int pinoTremPouso = 5;
     int pinoPortaBombas = 8;
     int pinoBombas = 9;
 
@@ -80,7 +80,7 @@ void abrirCompartimentoBombas(){
 //Rotina dos flaps
 //
 void verificaFlaps(){
-    if(digitalRead(pinoFlaps) == HIGH){
+    if(lePinoMultiplex(pinoFlaps) == true){
         //Se ele nao estiver ativo ira acionar
         if(!estadoFlaps){
             Serial.println("Ativando flaps!");
@@ -101,7 +101,7 @@ void verificaFlaps(){
 //Rotina do trem de pouso
 //
 void verificaTremPouso(){
-    if(digitalRead(pinoTremPouso) == HIGH){
+    if(lePinoMultiplex(pinoTremPouso) == true){
         //Se ele nao estiver ativo ira acionar
         if(!estadoTremPouso){
             Serial.println("Abaixando trem de pouso!");
@@ -125,7 +125,7 @@ void verificaEmbandeiramento(){
     //Testa todos os motores para saber se precisam ser alterados
     int motor = 0;
     while(motor <= 3){
-    	if(lePortaMultiplex(pinoMotor[i]) == TRUE){
+    	if(lePinoMultiplex(pinoMotor[i]) == true){
         	if(motorEmbandeirado[motor] == 0){
                 //Se ele nao estiver embandeirado ira executar a rotina
               	Serial.println("Iniciando Embandeiramento motor:" + String(motor + 1));
@@ -179,7 +179,7 @@ void selecionaMotores(int motorAlterado){
 //Rotina de acesso ao multiplexador
 //
 //Coloque o pino do multiplexador no qual o botao esta ligado 
-bool lePortaMultiplex(int pitoMultiplex ){
+bool lePinoMultiplex(int pitoMultiplex ){
     int matrixDecodBinario[][]{
         {0,0,0,0}
         {0,0,0,1}
@@ -202,9 +202,9 @@ bool lePortaMultiplex(int pitoMultiplex ){
         digitalWrite( pinoMultiplexador[i], matrixDecodBinario[pitoMultiplex][i];);
     }
     if (digitalRead(pitoRetornoMultiplex) == HIGT){
-        return TRUE;
+        return true;
     }
     else{
-        return FALSE;
+        return false;
     }
 }
