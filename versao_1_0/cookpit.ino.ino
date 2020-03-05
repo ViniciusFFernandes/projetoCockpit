@@ -21,6 +21,8 @@ bool estadoFlaps = false;
 bool estadoTremPouso = true;
 //Estado do trem de pouso
 bool estadoCompartimentoBomba = false;
+//estado do botao das bombas 
+bool estadoBombas = false;
 
 void setup(){
     Serial.begin(9600);
@@ -48,9 +50,13 @@ void loop(){
 //Rotina de Bombas
 //
 void liberarSerieBombas(){
-  if(digitalRead(pinoBombas) == HIGH){
+  if(digitalRead(pinoBombas) == HIGH && estadoBombas == false){
     Serial.println("Liberando Bombas!");
     Keyboard.write(teclaSerieBombas);
+    estadoBombas = true;
+  }
+  if(digitalRead(pinoBombas) == LOW && estadoBombas == true){
+    estadoBombas = false;
   }
 }
 
