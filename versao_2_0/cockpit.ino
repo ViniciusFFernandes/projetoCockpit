@@ -6,23 +6,19 @@
 //String teclaTremPouso = "G";
 //String teclaEmbandeiramento = "KEY_F5";
 //Configuração de pinos dos controle
-int pinoMultiplexador[] = {2, 3, 4, 5};
-int pitoRetornoMotor = 0; 
-int posiFlaps = 4;
-int posiTremPouso = 5;
-int pinoPortaBombas = 8;
-int pinoBombas = 9;
+    //Pinos do arduino ligados ao multiplexador (do mais para o menos relevante) 
+    int pinoMultiplexador[] = {2, 3, 4, 5};
+    int pitoRetornoMultiplex = 0; 
+
+    //Pinos do multiplexador onde ou botoes entao ligados
+    int pinoMotor[] = {0, 1, 2, 3};
+    int posiFlaps = 4;
+    int posiTremPouso = 5;
+    int pinoPortaBombas = 8;
+    int pinoBombas = 9;
+
 //Motores embandeirado
 int motorEmbandeirado[] = {0, 0, 0, 0};
-//Binarios para o multiplexador
-int binarios[][]{
-    {0,0,0,0}
-    {0,0,0,1}
-    {0,0,1,0}
-    {0,0,1,1}
-    {0,1,0,0}//f
-    {0,1,0,1}//t
-};
 //Estado dos flaps
 bool estadoFlaps = false;
 //Estado do trem de pouso
@@ -32,13 +28,29 @@ void setup(){
   	Serial.begin(9600);
   	//Keyboard.begin();
   	//
-    int motor = 0;
-    while(motor <= 3){
-        pinMode(pinoMultiplexador[motor], OUTPUT);
-      	Serial.println(pinoMultiplexador[motor]);
-        motor++;
+    //Comfiguração dos pinos do multiplexador
+    Serial.println("Configurando pinos do multiplexador...")
+    int i = 0;
+    while(i <= 3){
+        pinMode(pinoMultiplexador[i], OUTPUT);
+      	Serial.println(pinoMultiplexador[i]);
+        i++;
     }
-    pimMode(pitoRetornoMotor, INPUT);
+    Serial.println("Pinos configurados com sucesso");
+    Serial.println("");
+    pimMode(pitoRetornoMultiplex, INPUT);
+
+    //Comfigurando pinos dos motores
+    Serial.println("Configurando pinos dos motores...")
+    int i = 0;
+    while(i <= 3){
+        pinMode(pinoMotor[i], INPUT);
+      	Serial.println(pinoMotor[i]);
+        i++;
+    }
+    Serial.println("Pinos configurados com sucesso");
+    Serial.println("");
+
   	pinMode(pinoTremPouso, INPUT);
   	pinMode(pinoFlaps, INPUT);
 }
@@ -50,7 +62,6 @@ void loop(){
    verificaTremPouso();
    verificaEmbandeiramento();   
 }
-
 //
 //Rotina de Bombas
 //
@@ -114,12 +125,8 @@ void verificaEmbandeiramento(){
     //Testa todos os motores para saber se precisam ser alterados
     int motor = 0;
     while(motor <= 3){
-        //Envia binario para o multiplexador
-        for (i=0; i<=3; i++){
-            digitalWrite( pinoMultiplexador[i], binario[motor][i];);
-        }
-    	if(digitalRead(pitoRetornoMotor) == HIGH){
-        	if(pitoRetornoMotor[motor] == 0){
+    	if(lePortaMultiplex(pinoMotor[i]) == TRUE){
+        	if(motorEmbandeirado[motor] == 0){
                 //Se ele nao estiver embandeirado ira executar a rotina
               	Serial.println("Iniciando Embandeiramento motor:" + String(motor + 1));
           		embandeirarDesembandeirar(motor);
@@ -166,3 +173,38 @@ void selecionaMotores(int motorAlterado){
 //
 //Fim da rotina de embandeirar ou desembandeirar motores
 //
+
+
+//
+//Rotina de acesso ao multiplexador
+//
+//Coloque o pino do multiplexador no qual o botao esta ligado 
+bool lePortaMultiplex(int pitoMultiplex ){
+    int matrixDecodBinario[][]{
+        {0,0,0,0}
+        {0,0,0,1}
+        {0,0,1,0}
+        {0,0,1,1}
+        {0,1,0,0}
+        {0,1,0,1}
+        {0,1,1,0}
+        {0,1,1,1}
+        {1,0,0,0}
+        {1,0,0,1}
+        {1,0,1,0}
+        {1,0,1,1}
+        {1,1,0,0}
+        {1,1,0,1}
+        {1,1,1,0}
+        {1,1,1,1}
+    };
+    for (i=0; i<=3; i++){
+        digitalWrite( pinoMultiplexador[i], matrixDecodBinario[pitoMultiplex][i];);
+    }
+    if (digitalRead(pitoRetornoMultiplex) == HIGT){
+        return TRUE;
+    }
+    else{
+        return FALSE;
+    }
+}
