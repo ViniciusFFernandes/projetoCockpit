@@ -20,7 +20,7 @@ bool estadoFlaps = false;
 //Estado do trem de pouso
 bool estadoTremPouso = true;
 //Estado do trem de pouso
-bool estadoCompartimentoBomba = true;
+bool estadoCompartimentoBomba = false;
 
 void setup(){
     Serial.begin(9600);
@@ -58,20 +58,17 @@ void liberarSerieBombas(){
 //Rotina de Compartimento de Bombas
 //
 void abrirCompartimentoBombas(){
-  if(digitalRead(pinoPortaBombas) == HIGH){
-        //Se ele nao estiver ativo ira acionar
-        if(!estadoCompartimentoBomba){
-            Serial.println("Abrindo Compartimento de Bombas!");
-            Keyboard.write(teclaCompartimentoBomba);
-            estadoCompartimentoBomba = true;
-        }
-    }else{
-        //Se ele estiver ativo ira desacionar
-        if(estadoCompartimentoBomba){
-            Serial.println("Fechando Compartimento de Bombas!");
-            Keyboard.write(teclaCompartimentoBomba);
-            estadoCompartimentoBomba = false;
-        }
+    //Se ele nao estiver ativo ira acionar   
+    if(digitalRead(pinoPortaBombas) == HIGH && estadoCompartimentoBomba == false ){     
+        Serial.println("Abrindo Compartimento de Bombas!");
+        Keyboard.write(teclaCompartimentoBomba);
+        estadoCompartimentoBomba = true;  
+    }
+    //Se ele estiver ativo ira desacionar
+    if(digitalRead(pinoPortaBombas) == LOW && estadoCompartimentoBomba == true){
+        Serial.println("Fechando Compartimento de Bombas!");
+        Keyboard.write(teclaCompartimentoBomba);
+        estadoCompartimentoBomba = false;
     }
 }
 
