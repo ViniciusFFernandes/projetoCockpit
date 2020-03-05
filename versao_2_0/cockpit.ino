@@ -66,14 +66,31 @@ void loop(){
 //Rotina de Bombas
 //
 void liberarSerieBombas(){
-
+  if(lePinoMultiplex(pinoBombas) == true){
+    Serial.println("Liberando Bombas!");
+    Keyboard.write(teclaSerieBombas);
+  }
 }
 
 //
 //Rotina de Compartimento de Bombas
 //
 void abrirCompartimentoBombas(){
-
+  if(lePinoMultiplex(pinoPortaBombas) == true){
+        //Se ele nao estiver ativo ira acionar
+        if(!estadoCompartimentoBomba){
+            Serial.println("Abrindo Compartimento de Bombas!");
+            Keyboard.write(teclaCompartimentoBomba);
+            estadoCompartimentoBomba = true;
+        }
+    }else{
+        //Se ele estiver ativo ira desacionar
+        if(estadoCompartimentoBomba){
+            Serial.println("Fechando Compartimento de Bombas!");
+            Keyboard.write(teclaCompartimentoBomba);
+            estadoCompartimentoBomba = false;
+        }
+    }
 }
 
 //
