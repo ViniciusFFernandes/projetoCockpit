@@ -5,8 +5,8 @@ word teclasMotores[] = {"KEY_F1", "KEY_F2", "KEY_F3", "KEY_F4"};
 char teclaFlaps = 'f';
 char teclaTremPouso = 'g';
 word teclaEmbandeiramento = "KEY_F5";
-char teclaCompartimentoBomba = 'y';
-char teclaSerieBombas = 't';
+char teclaCompartimentoBomba = 'Y';
+char teclaSerieBombas = 'T';
 //Configuração de pinos dos controle
 int pinoEmbandeiramento[] = {2, 3, 4, 5};
 int pinoFlaps = 6;
@@ -39,9 +39,10 @@ void setup(){
 void loop(){
    liberarSerieBombas();
    abrirCompartimentoBombas(); 
-   verificaFlaps();
-   verificaTremPouso();
-   verificaEmbandeiramento();   
+   //verificaFlaps();
+   //verificaTremPouso();
+   //verificaEmbandeiramento(); 
+   delay(100); 
 }
 
 //
@@ -83,7 +84,7 @@ void verificaFlaps(){
         estadoFlaps = true;
     }
     //Se ele estiver ativo ira desacionar
-    if(digitalRead(pinoFlaps) == LOW && estadoFlaps){{
+    if(digitalRead(pinoFlaps) == LOW && estadoFlaps){
         Serial.println("Desativando flaps!");
         Keyboard.write(teclaFlaps);
         estadoFlaps = false;
@@ -120,6 +121,7 @@ void verificaEmbandeiramento(){
             //Se ele nao estiver embandeirado ira executar a rotina
             Serial.println("Iniciando Embandeiramento motor:" + String(motor + 1));
             embandeirarDesembandeirar(motor);
+      }
       if(digitalRead(pinoEmbandeiramento[motor]) == LOW && motorEmbandeirado[motor]){
             //Se ele nao estiver desembandeirado ira executar a rotina
             Serial.println("Iniciando Desembandeiramento motor:" + String(motor + 1));
